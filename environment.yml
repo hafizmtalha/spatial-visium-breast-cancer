@@ -1,0 +1,15 @@
+name: spatial-visium-breast-cancer
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12.15
+  - snakemake-minimal=9.27.1
+  - scanpy=1.12.4
+  - squidpy=1.8.2
+  - anndata=0.13.4
+  - leidenalg=0.12.0
+  - python-igraph=1.0.0
+  - matplotlib=3.11.2
+  - seaborn=0.13.2
+  - pandas=3.0.6

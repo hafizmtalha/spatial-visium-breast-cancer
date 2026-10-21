@@ -1,0 +1,82 @@
+configfile: "config/config.yaml"
+
+
+rule all:
+    input:
+        "results/figures/clusters_on_tissue.png",
+        "results/figures/spatially_variable_genes.png",
+        "results/figures/cell_type_scores_on_tissue.png",
+
+
+rule download:
+    output:
+        h5="data/visium/filtered_feature_bc_matrix.h5",
+        positions="data/visium/spatial/tissue_positions_list.csv",
+    params:
+        url=config["base_url"],
+    retries: 2
+    shell:
+        """
+        curl -sL --retry 5 -o {output.h5} {params.url}_filtered_feature_bc_matrix.h5
+        curl -sL --retry 5 {params.url}_spatial.tar.gz | tar xz -C data/visium
+        """
+
+
+rule load_qc:
+    input:
+        "data/visium/filtered_feature_bc_matrix.h5",
+    output:
+        adata="results/adata/01_qc.h5ad",
+        tissue="results/figures/tissue_image.png",
+        qc_spatial="results/figures/qc_on_tissue.png",
+        qc_hist="results/figures/qc_histograms.png",
+        table="results/tables/qc_summary.tsv",
+    log:
+        "logs/01_load_qc.log",
+    script:
+        "scripts/01_load_qc.py"
+
+
+rule cluster:
+    input:
+        "results/adata/01_qc.h5ad",
+    output:
+        adata="results/adata/02_clustered.h5ad",
+        tissue="results/figures/clusters_on_tissue.png",
+        dotplot="results/figures/cluster_markers_dotplot.png",
+        markers="results/tables/cluster_markers.tsv",
+    log:
+        "logs/02_cluster.log",
+    script:
+        "scripts/02_cluster.py"
+
+
+rule spatial_stats:
+    input:
+        "results/adata/02_clustered.h5ad",
+    output:
+        adata="results/adata/03_spatial.h5ad",
+        svg_table="results/tables/spatially_variable_genes.tsv",
+        svg_plot="results/figures/spatially_variable_genes.png",
+        nhood="results/figures/neighborhood_enrichment.png",
+        cooc="results/figures/cluster_co_occurrence.png",
+    log:
+        "logs/03_spatial_stats.log",
+    threads: 4
+    script:
+        "scripts/03_spatial_stats.py"
+
+
+rule cell_types:
+    input:
+        "results/adata/03_spatial.h5ad",
+    output:
+        adata="results/adata/04_cell_types.h5ad",
+        tissue="results/figures/cell_type_scores_on_tissue.png",
+        by_cluster="results/figures/cell_type_scores_by_cluster.png",
+        colocal="results/figures/cell_type_colocalization.png",
+        table="results/tables/cell_type_scores_by_cluster.tsv",
+    log:
+        "logs/04_cell_types.log",
+    script:
+        "scripts/04_cell_types.py"

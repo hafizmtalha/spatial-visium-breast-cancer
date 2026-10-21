@@ -1,0 +1,21 @@
+# Public 10x Genomics Visium dataset: human breast cancer, block A section 1.
+# Fresh frozen invasive ductal carcinoma, about 3,800 spots under the tissue.
+base_url: https://cf.10xgenomics.com/samples/spatial-exp/1.1.0/V1_Breast_Cancer_Block_A_Section_1/V1_Breast_Cancer_Block_A_Section_1
+sample: V1_Breast_Cancer_Block_A_Section_1
+
+# Spot filters
+min_counts: 1000
+min_genes: 500
+max_pct_mito: 20
+min_spots_per_gene: 10
+
+# Clustering
+n_top_genes: 3000
+n_pcs: 30
+leiden_resolution: 0.6
+
+# Spatial statistics
+n_rings: 1          # 1 ring = the 6 spots that touch each spot on the Visium grid
+n_svg_to_plot: 12
+
+seed: 0
